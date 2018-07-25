@@ -1,20 +1,13 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { newPost } from "./reducers/ActionCreators";
 class PostForm extends Component {
   handleSubmit = e => {
     e.preventDefault();
     const author = this.getTitle.value;
     const body = this.getMessage.value;
-    const data = {
-      id: new Date(),
-      author,
-      body,
-      editing: false
-    };
-    this.props.dispatch({
-      type: "ADD_POST",
-      data
-    });
+
+    this.props.dispatch(newPost(author, body));
     this.getTitle.value = "";
     this.getMessage.value = "";
   };

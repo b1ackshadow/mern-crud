@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { deletePost, editPost } from "./reducers/ActionCreators";
 class Post extends Component {
   render() {
     return (
@@ -20,12 +21,7 @@ class Post extends Component {
           </button>
           <button
             className="delete"
-            onClick={() =>
-              this.props.dispatch({
-                type: "DELETE_POST",
-                id: this.props.post._id
-              })
-            }
+            onClick={() => this.props.dispatch(deletePost(this.props.post._id))}
           >
             Delete
           </button>

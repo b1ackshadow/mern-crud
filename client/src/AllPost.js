@@ -8,6 +8,7 @@ class AllPost extends Component {
       <div>
         <h1 className="post_heading">All Posts</h1>
         {this.props.posts.map((post, i) => {
+          console.log(post);
           return (
             <div key={post._id}>
               {post.editing ? (

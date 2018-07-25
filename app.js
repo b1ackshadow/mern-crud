@@ -6,9 +6,9 @@ const bodyParser = require("body-parser");
 const methodOverride = require("method-override");
 
 const dummy = [
-  { author: "dhanush", body: "First time React app" },
-  { author: "dummy", body: "LIGAM" },
-  { author: "XHU", body: "Bye" }
+  { author: "dhanush", body: "First time React app", editing: false },
+  { author: "dummy", body: "LIGAM", editing: false },
+  { author: "XHU", body: "Bye", editing: false }
 ];
 
 const seedDB = async dummy => {
@@ -17,7 +17,7 @@ const seedDB = async dummy => {
   if (result) console.log("seeding db successful");
   else console.log("Sedding db failed");
 };
-// seedDB(dummy);
+seedDB(dummy);
 
 mongoose.connect(
   "mongodb://localhost:27017/mern",
@@ -28,7 +28,7 @@ const handleError = fn => (...params) =>
   fn(...params).catch(error => console.log(error));
 app.use(methodOverride("_method"));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 // allow-cors
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -58,7 +58,10 @@ app.post(
       body: req.body.body
     });
     post.save();
-    res.redirect("/");
+
+    if (post) {
+      return res.json(post);
+    }
   })
 );
 
@@ -73,6 +76,7 @@ app.get(
 app.put(
   "/post/:id",
   handleError(async (req, res) => {
+    console.log(JSON.stringify(req.body) + "req body");
     const post = await Post.findOneAndUpdate({ _id: req.params.id }, req.body, {
       new: true
     });
@@ -80,6 +84,7 @@ app.put(
       console.log(post);
       return res.redirect("back");
     }
+    console.log("updated post on server " + post);
     res.json(post);
   })
 );
@@ -87,8 +92,8 @@ app.put(
 app.delete(
   "/post/:id",
   handleError(async (req, res) => {
-    await Post.findOneAndRemove({ _id: req.params.id });
-    res.redirect("/");
+    const deletedPost = await Post.findOneAndRemove({ _id: req.params.id });
+    res.json(deletedPost._id);
   })
 );
 

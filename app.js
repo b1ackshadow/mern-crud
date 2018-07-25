@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const Post = require("./Post.model");
 const bodyParser = require("body-parser");
 const methodOverride = require("method-override");
+require("dotenv").config({ path: "variables.env" });
 
 const dummy = [
   { author: "dhanush", body: "First time React app", editing: false },
@@ -17,12 +18,17 @@ const seedDB = async dummy => {
   if (result) console.log("seeding db successful");
   else console.log("Sedding db failed");
 };
-seedDB(dummy);
+const eraseDB = async () => {
+  await Post.remove({});
+};
+// seedDB(dummy);
 
 mongoose.connect(
-  "mongodb://localhost:27017/mern",
+  process.env.DATA_BASE,
   { useNewUrlParser: true }
 );
+mongoose.Promise = global.Promise;
+app.set("port", process.env.PORT || 5000);
 
 const handleError = fn => (...params) =>
   fn(...params).catch(error => console.log(error));
@@ -36,6 +42,13 @@ app.use(function(req, res, next) {
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
   );
+  let d = new Date();
+  let h = d.getHours();
+  let m = d.getMinutes();
+  let s = d.getSeconds();
+  console.log(h + ":" + m + ":" + s);
+
+  if (h === 0 && m === 0) eraseDB();
   next();
 });
 mongoose.connection.on("error", err => {
@@ -97,6 +110,6 @@ app.delete(
   })
 );
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+app.listen(app.get("port"), () => {
+  console.log(`Server running on port ${app.get("port")}`);
 });

@@ -1,37 +1,12 @@
 const express = require("express");
 const app = express();
-const mongoose = require("mongoose");
-const Post = require("./Post.model");
 const bodyParser = require("body-parser");
 const methodOverride = require("method-override");
-require("dotenv").config({ path: "variables.env" });
+const seedDB = require("./seedDB");
+const handleError = require("./handlers/errorHandlers");
+const postRoutes = require("./routes/post.routes");
+// handleError(seedDB());
 
-const dummy = [
-  { author: "dhanush", body: "First time React app", editing: false },
-  { author: "dummy", body: "LIGAM", editing: false },
-  { author: "XHU", body: "Bye", editing: false }
-];
-
-const seedDB = async dummy => {
-  await Post.remove({});
-  const result = await Post.insertMany(dummy);
-  if (result) console.log("seeding db successful");
-  else console.log("Sedding db failed");
-};
-const eraseDB = async () => {
-  await Post.remove({});
-};
-// seedDB(dummy);
-
-mongoose.connect(
-  process.env.DATA_BASE,
-  { useNewUrlParser: true }
-);
-mongoose.Promise = global.Promise;
-app.set("port", process.env.PORT || 5000);
-
-const handleError = fn => (...params) =>
-  fn(...params).catch(error => console.log(error));
 app.use(methodOverride("_method"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -51,65 +26,7 @@ app.use(function(req, res, next) {
   if (h === 0 && m === 0) eraseDB();
   next();
 });
-mongoose.connection.on("error", err => {
-  console.error(`🙅 🚫 🙅 🚫 🙅 🚫 🙅 🚫 → ${err.message}`);
-});
 
-app.get(
-  "/",
-  handleError(async (req, res) => {
-    const posts = await Post.find({});
-    res.json(posts);
-  })
-);
+app.use("/", postRoutes);
 
-app.post(
-  "/post",
-  handleError(async (req, res) => {
-    const post = await new Post({
-      author: req.body.author,
-      body: req.body.body
-    });
-    post.save();
-
-    if (post) {
-      return res.json(post);
-    }
-  })
-);
-
-app.get(
-  "/post/:id",
-  handleError(async (req, res) => {
-    const post = await Post.findOne({ _id: req.params.id });
-    res.json(post);
-  })
-);
-
-app.put(
-  "/post/:id",
-  handleError(async (req, res) => {
-    console.log(JSON.stringify(req.body) + "req body");
-    const post = await Post.findOneAndUpdate({ _id: req.params.id }, req.body, {
-      new: true
-    });
-    if (!post) {
-      console.log(post);
-      return res.redirect("back");
-    }
-    console.log("updated post on server " + post);
-    res.json(post);
-  })
-);
-
-app.delete(
-  "/post/:id",
-  handleError(async (req, res) => {
-    const deletedPost = await Post.findOneAndRemove({ _id: req.params.id });
-    res.json(deletedPost._id);
-  })
-);
-
-app.listen(app.get("port"), () => {
-  console.log(`Server running on port ${app.get("port")}`);
-});
+module.exports = app;

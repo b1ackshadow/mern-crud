@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { editPost, addPosts } from "./reducers/ActionCreators";
+import { editPost } from "../reducers/ActionCreators";
 
 class EditComponent extends Component {
   handleEdit = e => {
@@ -8,15 +8,6 @@ class EditComponent extends Component {
     const author = this.getTitle.value;
     const body = this.getMessage.value;
     console.log(this.props.post._id + author + body);
-    // const data = {
-    //   author,
-    //   body
-    // };
-    // this.props.dispatch({
-    //   type: "UPDATE",
-    //   id: this.props.post._id,
-    //   data: data
-    // });
 
     this.props.dispatch(editPost(this.props.post._id, author, body));
   };

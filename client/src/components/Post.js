@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { deletePost, editPost } from "./reducers/ActionCreators";
+import { deletePost } from "../reducers/ActionCreators";
 class Post extends Component {
   render() {
     return (
       <div className="post">
+        {console.log(this.props.user.name)}
         <h2 className="post_title">{this.props.post.author}</h2>
         <p className="post_message">{this.props.post.body}</p>
         <div className="control-buttons">
@@ -30,4 +31,9 @@ class Post extends Component {
     );
   }
 }
-export default connect()(Post);
+const mapStateToProps = state => {
+  return {
+    user: state.user
+  };
+};
+export default connect(mapStateToProps)(Post);

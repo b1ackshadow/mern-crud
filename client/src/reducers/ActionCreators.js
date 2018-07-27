@@ -143,3 +143,50 @@ export const updatePost = post => ({
   type: "UPDATE_POST",
   post
 });
+
+//Register user
+
+export const registerUser = (email, name, password) => dispatch => {
+  const userObj = {
+    email,
+    password,
+    name
+  };
+  return fetch(baseUrl + "register", {
+    mode: "cors",
+    method: "post",
+    body: JSON.stringify(userObj),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+    .then(
+      response => {
+        if (response.ok) {
+          return response;
+        } else {
+          var error = new Error(
+            "Error " + response.status + ": " + response.statusText
+          );
+          error.response = response;
+          throw error;
+        }
+      },
+      error => {
+        var errmess = new Error(error.message);
+        throw errmess;
+      }
+    )
+    .then(response => response.json())
+    .then(user => {
+      console.log("New user" + JSON.stringify(user));
+      return dispatch(addNewUser(JSON.stringify(user)));
+    })
+    .catch(error => console.log(error));
+};
+
+export const addNewUser = user => ({
+  type: "ADD_USER",
+  name: user.name,
+  _id: user._id
+});

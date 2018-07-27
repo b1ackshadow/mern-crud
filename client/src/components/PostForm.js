@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { newPost } from "./reducers/ActionCreators";
+import { newPost } from "../reducers/ActionCreators";
 class PostForm extends Component {
   handleSubmit = e => {
     e.preventDefault();
